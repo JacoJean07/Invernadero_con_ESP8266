@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
+    <title>LOGIN</title>
+</head>
+<body 
+    align="center" 
+    style="
+    font-family: 'Montserrat', sans-serif;
+    background-color: rgb(112, 141, 123);
+">
+    <section class="box" 
+    style="
+    padding: 3%;
+    border-style: solid;
+    border-color: rgb(83, 167, 137);
+    border-radius: 5%;
+    margin: 10% 20% 10% 20%;
+    background-color: azure;
+    ">
+        <div>
+            <img src="img/login.png"
+            style="height: 70px;
+            margin: 3%;">
+            <h1>Login</h1>
+            
+        </div>
+        <br>
+        <br>
+        <div>
+            <h3>Usuario</h3>
+            <input type="text">
+            
+        </div>
+        <br>
+        <div>
+            <h3>Contraseña</h3>
+            <input type="password">
+        </div>
+        <div>
+            <button style="
+            padding: 3%;
+            border-radius: 10pc;
+            border-color: rgb(36, 161, 120);
+            background-color: aliceblue;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 50px;
+            width: 150px;
+            margin-top: 30px;
+            "><h3>Ingresar</h3></button>
+        </div>
+        <br>
+    </section>
+
+
+    <section>
+        <hr>
+        <br>
+        <button id="invitado" 
+        style="
+        padding: 3%;
+        border-radius: 10pc;
+        border-color: rgb(36, 161, 120);
+        background-color: aliceblue;
+        font-family: 'Montserrat', sans-serif;
+        margin-bottom: 50px;
+        ">
+            <strong>Ingresar como Invitado</strong>
+        </button>
+    </section>
+
+
+    <script>
+        function login() {
+            var usuarios = {
+                "Jean": "jeancarlos10171",
+                "LGSUS": "lgsusjk",
+                "Pablo": "12345678",
+                "Yamileth": "12345678",
+                "Shirley": "12345678"
+            };
+
+            var usuario = document.querySelector('input[type="text"]').value;
+            var contrasena = document.querySelector('input[type="password"]').value;
+
+            if (usuario in usuarios && usuarios[usuario] === contrasena) {
+                alert("¡Bienvenido/a " + usuario + "!");
+                window.location.href = "pagina_usuario.html"; 
+            } else {
+                alert("Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.");
+            }
+        }
+
+        function ingresarComoInvitado() {
+            window.location.href = "pagina_invitado.html"; 
+        }
+
+        document.querySelector('button').addEventListener('click', login);
+        document.getElementById('invitado').addEventListener('click', ingresarComoInvitado);
+    </script>
+</body>
+</html>

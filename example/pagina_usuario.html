@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
+    <title>GreenSense</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body 
+align="center" 
+    style="
+    font-family: 'Montserrat', sans-serif;
+    background-color: rgb(255, 255, 255);
+">
+    <div style="background-color: rgb(191, 237, 245); padding: 5%;">
+        <h1>GreenSense</h1>
+        <p>Gestión Inteligente de Invernaderos - Monitoreo de Temperatura y Humedad</p>
+    </div>
+    <section>
+        <h2>Temperatura ambiente</h2>
+        <div style="display: flex; padding: 6%;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3304/3304928.png" style="width: 40%;">
+            
+            <div>
+                <label id="temperatura" for="temperatura" style="font-size: 50px;">0°C</label>
+                <div style="display: flex;">
+                <h4>Ventiladores:</h4>
+                
+                </div>
+                <div style="display: flex;">
+                <h4>Estado:</h4>
+                <h4 style="padding-left: 50px;">Encendido</h4>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h2>Humedad Ambiente</h2>
+        <div style="display: flex; padding: 6%;">
+            <img src="https://cdn-icons-png.flaticon.com/512/1622/1622158.png" style="width: 40%;">
+            
+            <div style="margin: auto;">
+                <label id="humedad" for="humedad" style="font-size: 50px;">0%</label>
+                <div style="display: flex;">
+                
+                </div>
+            </div>
+        </div style="margin-bottom: 30px;">
+        <hr>
+        <h2>Humedad del suelo</h2>
+        <div style="display: flex; padding: 6%;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3439/3439885.png" style="width: 40%;">
+            
+            <div>
+                <label id="humedad-suelo" for="humedad-suelo" style="font-size: 50px;">0%</label>                <div style="display: flex;">
+                <h4>Riego:</h4>
+                <button id="botonRiego" onclick="cambiarEstadoRiego()"
+                    style="
+                    padding: 5px 30px;
+                    margin-left: 60px; 
+                    background-color: red;
+                    border-color: rgba(0, 0, 0, 0.589);
+                    border-radius: 10px;
+                "></button>
+                </div>
+                <div style="display: flex;">
+                <h4>Estado:</h4>
+                <h4 id="estadoRiego" style="padding-left: 50px;">Apagado</h4>
+                </div>
+            </div>
+        </div style="margin-bottom: 30px;">
+    </section>
+    <hr>
+    <div>
+        <button 
+            style="
+            padding: 10px 40px;
+            background-color: rgb(191, 237, 245);
+            border-color: rgb(94, 128, 134);
+            border-style: solid;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            margin: 6%;
+        " id="guardar-registro-btn"><h3>Guardar Registro</h3></button>
+    </div>
+    <hr>
+    <div>
+        <div class="registro">
+            <h3 style="margin: 5%;">Registros</h3>
+        </div>
+        <div class="RegistrosVisualizacion">
+            
+            <div class="registrosFirebase" style="border-style: solid;
+            border-top-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            padding: 10px;
+            margin-left: 5%;
+            margin-right: 5%;
+            border-color: rgb(103, 209, 89);
+            ">
+    
+            </div>
+            <button id="left-button" style="
+            padding: 10px 30px;
+            background-color: rgb(191, 237, 245);
+            border-color: rgb(94, 128, 134);
+            border-style: solid;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            margin: 6%;"
+            ><h3>Anterior</h3></button>
+            <button id="rigth-button"
+            style="
+            padding: 10px 30px;
+            background-color: rgb(191, 237, 245);
+            border-color: rgb(94, 128, 134);
+            border-style: solid;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            margin: 6%;"
+            ><h3>Siguiente</h3></button>
+        </div>      
+    </div>    
+    <br>
+    <br>
+    <br>
+    <br>
+
+            
+    <script>
+        // Mis datos chavallllll
+        var firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            measurementId: ""
+        };
+    
+        firebase.initializeApp(firebaseConfig);
+
+
+        var db = firebase.firestore();
+        var riegoRef = firebase.database().ref("Riego");
+        var estadoRiegoLabel = document.getElementById("estadoRiego");
+        
+        
+
+        // Función para leer los datos desde Firebase Realtime Database
+        function leerDatos() {
+                var nodoRealtime = firebase.database().ref("realtime");
+
+                nodoRealtime.on("value", function(snapshot) {
+                    var datos = snapshot.val();
+                    if (datos) {
+                        var temperatura = datos.Temperatura;
+                        var humedad = datos.Humedad_A;
+                        var humedadSuelo = datos.Humedad_Suelo;
+                        mostrarDatos(temperatura, humedad, humedadSuelo);
+                    }
+                });
+            }
+
+        // Llama a la función para leer los datos cuando la página se carga
+        leerDatos();
+
+        function mostrarDatos(temperatura, humedad, humedadSuelo) {
+            document.getElementById("temperatura").textContent = temperatura + " °C";
+            document.getElementById("humedad").textContent = humedad + " %";
+            document.getElementById("humedad-suelo").textContent = humedadSuelo + " %";
+        }
+    
+        // Función para guardar el registro en Firestore
+        function guardarRegistro() {
+            var temperatura = document.querySelector("label[for='temperatura']").textContent;
+            var humedad = document.querySelector("label[for='humedad']").textContent;
+            var humedad_suelo = document.querySelector("label[for='humedad-suelo']").textContent;
+            var fecha = new Date();
+    
+            db.collection('registros').add({ temperatura, humedad, humedad_suelo, fecha })
+                .then(function(docRef) {    
+                    console.log("Registro guardado con ID:", docRef.id);
+                })
+                .catch(function(error) {
+                    console.error("Error al guardar el registro:", error);
+                });
+        }
+    
+        // "Guardar Registro" el evento para que se accione pe causa
+        document.getElementById("guardar-registro-btn").addEventListener("click", function() {
+            guardarRegistro();
+            alert("Botón de Guardar Registro presionado");
+        });
+
+        // estas variables sirven para la navegacion de registros, ya que obtiene los registros pero no los muestra y la variable llamada registro actual es la que se le da el valor de 0 para que aparezca en pantalla
+        var registros = []; // Array para almacenar los registros obtenidos de Firestore
+        var registroActual = 0; // registro que se muestra en pantalla
+
+        function mostrarRegistros() {
+            var registrosDiv = document.querySelector(".registrosFirebase");
+            registrosDiv.innerHTML = ""; 
+
+            // consulta la colección "registros" en Firestore, ordenada por fecha
+            db.collection("registros")
+                .orderBy("fecha", "desc")
+                .get()
+                .then(function(querySnapshot) {
+                    // guarda los registros en un array po weon
+                    registros = [];
+                    querySnapshot.forEach(function(doc) {
+                        registros.push(doc.data());
+                    });
+
+                    mostrarRegistroActual();
+                })
+                .catch(function(error) {
+                    console.log("Error al obtener los registros:", error);
+                });
+        }
+
+        // muestra uno de los varios registros en pantalla
+        function mostrarRegistroActual() {
+            var registrosDiv = document.querySelector(".registrosFirebase");
+            registrosDiv.innerHTML = "";
+
+            var registro = registros[registroActual];
+            var temperatura = registro.temperatura;
+            var humedad = registro.humedad;
+            var humedad_suelo = registro.humedad_suelo;
+            var fecha = registro.fecha.toDate(); // Convierte el Timestamp en un objeto Date porque si no no funciona ya que esta poronga está tan bugueada del firebase que no tiene datos tipo dato me cago en las 3 horas que estuve investigando para que venga a ser una estupides
+
+            // Obtiene el nombre del día de la semana para mejor comprensión
+            var diasSemana = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+            var nombreDia = diasSemana[fecha.getDay()];
+
+            // objetos dentro del div creado a continuasao
+            var registroDiv = document.createElement("div");
+            registroDiv.innerHTML = "<strong>Fecha:</strong> " + nombreDia + ", " + fecha.toLocaleString() + "<br>" +
+                                    "<strong>Temperatura Ambiente:</strong> " + temperatura + "<br>" +
+                                    "<strong>Humedad Ambiente:</strong> " + humedad + "<br>"+
+                                    "<strong>Humedad Suelo:</strong> " + humedad_suelo + "";
+
+            // crea un div html que contiene los registros obtenidos pe causa
+            registrosDiv.appendChild(registroDiv);
+        }
+
+        mostrarRegistros();
+
+        // hace que el boton anterior sirva el hijo de su puta madre
+        document.getElementById("left-button").addEventListener("click", function() {
+            registroActual = Math.max(0, registroActual - 1);
+            mostrarRegistroActual();
+        });
+
+        // hace que el boton siguiente sirva el hijo de su puta madre
+        document.getElementById("rigth-button").addEventListener("click", function() {
+            registroActual = Math.min(registros.length - 1, registroActual + 1);
+            mostrarRegistroActual();
+        })();        
+        
+
+                // Función para cambiar el valor del dato "Riego" en Firebase
+                function cambiarEstadoRiego() {
+                // Utiliza get() en lugar de once() para obtener el valor
+                riegoRef.get()
+                    .then(function(snapshot) {
+                        // Obtiene el valor actual del dato "Riego"
+                        var valorActual = snapshot.val();
+
+                        // Cambia el valor a 1 si es 0 o a 0 si es 1
+                        var nuevoValor = valorActual === 0 ? 1 : 0;
+
+                        // Actualiza el dato "Riego" en Firebase con el nuevo valor
+                        riegoRef.set(nuevoValor)
+                            .then(function() {
+                                console.log("Valor de Riego actualizado a: " + nuevoValor);
+                            })
+                            .catch(function(error) {
+                                console.error("Error al actualizar el valor de Riego:", error);
+                            });
+                    })
+                    .catch(function(error) {
+                        console.error("Error al obtener el valor de Riego:", error);
+                    });
+            }
+            function cambiarEstadoRiego() {
+            riegoRef.once("value")
+                .then(function(snapshot) {
+                    // Obtiene el valor actual del dato "Riego"
+                    var valorActual = snapshot.val();
+
+                    // Cambia el valor a 1 si es 0 o a 0 si es 1
+                    var nuevoValor = valorActual === 0 ? 1 : 0;
+
+                    // Actualiza el dato "Riego" en Firebase con el nuevo valor
+                    riegoRef.set(nuevoValor)
+                        .then(function() {
+                            console.log("Valor de Riego actualizado a: " + nuevoValor);
+                            // Actualiza el estado del riego en el label
+                            estadoRiegoLabel.textContent = nuevoValor === 1 ? "Encendido" : "Apagado";
+                            // Cambia el color del botón según el valor del riego
+                            if (nuevoValor === 1) {
+                                botonRiego.style.backgroundColor = "green";
+                            } else {
+                                botonRiego.style.backgroundColor = "red";
+                            }
+                        })
+                        .catch(function(error) {
+                            console.error("Error al actualizar el valor de Riego:", error);
+                        });
+                })
+                .catch(function(error) {
+                    console.error("Error al obtener el valor de Riego:", error);
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+/* Estilos para el botón cuando el valor es 0 (Apagado) */
+#botonRiego {
+    background-color: red;
+    border-color: rgba(0, 0, 0, 0.589);
+}
+
+/* Estilos para el botón cuando el valor es 1 (Encendido) */
+#botonRiego.encendido {
+    background-color: green;
+    border-color: rgba(0, 0, 0, 0.589);
+}

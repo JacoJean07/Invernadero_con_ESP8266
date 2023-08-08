@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
+    <title>GreenSense</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+
+</head>
+<body 
+align="center" 
+    style="
+    font-family: 'Montserrat', sans-serif;
+    background-color: rgb(255, 255, 255);
+">
+    <div style="background-color: rgb(191, 237, 245); padding: 5%;">
+        <h1>GreenSense</h1>
+        <p>Gestión Inteligente de Invernaderos - Monitoreo de Temperatura y Humedad</p>
+    </div>
+    <div style="background-color: rgb(191, 245, 198); padding: 5%;">
+        <h1>Invitado</h1>
+    </div>
+    <section>
+        <h2>Temperatura ambiente</h2>
+        <div style="display: flex; padding: 6%;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3304/3304928.png" style="width: 40%;">
+            
+            <div style="margin: auto;">
+                <label id="temperatura" for="temperatura" style="font-size: 50px;">0°C</label>
+            </div>
+        </div>
+        <hr>
+        <h2>Humedad Ambiente</h2>
+        <div style="display: flex; padding: 6%;">
+            <img src="https://cdn-icons-png.flaticon.com/512/1622/1622158.png" style="width: 40%;">
+            
+            <div style="margin: auto;">
+                <label id="humedad" for="humedad" style="font-size: 50px;">0%</label>
+            </div>
+        </div style="margin-bottom: 30px;">
+        <hr>
+        <h2>Humedad del suelo</h2>
+        <div style="display: flex; padding: 6%;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3439/3439885.png" style="width: 40%;">
+            
+            <div style="margin: auto;">
+                <label id="humedad-suelo" for="humedad-suelo" style="font-size: 50px;">0%</label>
+            </div>
+        </div style="margin-bottom: 30px;">
+    </section>
+
+    <br>
+    <br>
+    <br>
+    <br>
+
+            
+    <script>
+        // Mis datos chavallllll
+        var firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            measurementId: ""
+        };
+    
+        firebase.initializeApp(firebaseConfig);
+
+
+        var db = firebase.firestore();
+
+        // Función para leer los datos desde Firebase Realtime Database
+    function leerDatos() {
+            var nodoRealtime = firebase.database().ref("realtime");
+
+            nodoRealtime.on("value", function(snapshot) {
+                var datos = snapshot.val();
+                if (datos) {
+                    var temperatura = datos.Temperatura;
+                    var humedad = datos.Humedad_A;
+                    var humedadSuelo = datos.Humedad_Suelo;
+                    mostrarDatos(temperatura, humedad, humedadSuelo);
+                }
+            });
+        }
+
+        // Llama a la función para leer los datos cuando la página se carga
+        leerDatos();
+
+        function mostrarDatos(temperatura, humedad, humedadSuelo) {
+            document.getElementById("temperatura").textContent = temperatura + " °C";
+            document.getElementById("humedad").textContent = humedad + " %";
+            document.getElementById("humedad-suelo").textContent = humedadSuelo + " %";
+        }
+    </script>
+</body>
+</html>
